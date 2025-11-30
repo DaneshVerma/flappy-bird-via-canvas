@@ -8,14 +8,27 @@
   </head>
   <body>
     <canvas id="game"></canvas>
-    <div id="scoreBoard">Score: 0</div>
+    <div id="scoreBoard" class="hidden">
+      <h2 class="current">Score : 0</h2>
+      <div class="logo"></div>
+      <h2 class="high">Highest : 0</h2>
+    </div>
+    <div id="gameStartScreen">
+      <div class="card">
+        <h1 class="sher">🦁</h1>
+        <h1>Flappy Sher!</h1>
+        <button id="startBtn">Start Game</button>
+      </div>
+    </div>
     <div id="gameOverScreen" class="hidden">
       <div class="card">
         <h1>Game Over!</h1>
         <p id="finalScore"></p>
-        <button id="restartBtn">Restart</button>
+        <button id="restartBtn">
+          <b>Restart</b> / <span><i>Press Enter</i></span>
+        </button>
       </div>
-    </div>  
+    </div>
     <script src="script.js"></script>
   </body>
 </html>
