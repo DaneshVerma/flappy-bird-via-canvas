@@ -19,8 +19,8 @@ let birdVelocity = 0;
 let score = 0;
 let dead = false;
 let animationId = null;
-const gravity = 0.2;
-const jumpForce = -5;
+const gravity = 0.4;
+const jumpForce = -8;
 
 const pipeImg = new Image();
 pipeImg.src = "./images/image.png";
@@ -55,17 +55,18 @@ function resetGame() {
   gameOverScreen.classList.add("hidden");
 }
 
+function restart() {
+  resetGame();
+  loop();
+}
 function gameOver() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   gameOverScreen.classList.remove("hidden");
   scoreElement.classList.add("hidden");
-  finalScore.innerText = `Your final score is: ${score}`;
+  finalScore.innerText = `Your score is: ${score}`;
   cancelAnimationFrame(animationId);
 
-  restartBtn.onclick = function () {
-    resetGame();
-    loop();
-  };
+  restartBtn.onclick = restart;
 }
 
 function isColliding(
@@ -177,15 +178,14 @@ function loop() {
 window.addEventListener("keydown", function (e) {
   if (e.code === "Space") {
     birdVelocity = jumpForce;
-  }
-});
-
-window.addEventListener("keydown", function (e) {
-  if (e.code === "ArrowLeft") {
+  } else if (e.code === "ArrowLeft") {
     birdX = birdX - 10;
-  }
-  if (e.code === "ArrowRight") {
+  } else if (e.code === "ArrowRight") {
     birdX = birdX + 10;
+  } else if (e.code === "Enter") {
+    if (dead) {
+      restart();
+    }
   }
 });
 
