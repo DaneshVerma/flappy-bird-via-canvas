@@ -17,7 +17,7 @@ function game() {
   canvas.height = 1280;
 
   let pipes = [];
-  let pipeWidth = 100;
+  let pipeWidth = 150;
   let pipeSpwanTimer = 0;
   let birdY = 20;
   let birdX = 50;
@@ -28,6 +28,9 @@ function game() {
   let highScore = localStorage.getItem("flappyscore") || 0;
   let dead = false;
   let animationId = null;
+  let spawnInterval = 240; // frames between pipe spawns
+  let baseSpeed = 1.5;
+
   const gravity = 0.4;
   const jumpForce = -8;
 
@@ -60,6 +63,7 @@ function game() {
     birdVelocity = 0;
     score = 0;
     dead = false;
+    spawnInterval = 180;
     scoreElement.innerText = `Score : ${score}`;
     gameOverScreen.classList.add("hidden");
     scoreElement.classList.remove("hidden");
@@ -117,7 +121,7 @@ function game() {
     // UPDATE + DRAW PIPES
     for (let i = 0; i < pipes.length; i++) {
       const pipe = pipes[i];
-      pipe.x -= 1.5;
+      pipe.x -= baseSpeed;
 
       // draw
       ctx.fillStyle = "green";
@@ -137,6 +141,14 @@ function game() {
         score++;
         scoreElement.innerText = `Score: ${score}`;
         pipe.counted = true;
+        if (score > highScore) {
+          highScore = score;
+          highScoreElement.innerText = `HighScore: ${highScore}`;
+        }
+        if (score % 5 === 0 && spawnInterval > 60) {
+          spawnInterval -= 30; // increase difficulty
+          baseSpeed += 0.5; // increase pipe speed
+        }
       }
 
       // remove offscreen pipes
@@ -185,7 +197,7 @@ function game() {
 
     // spawn new pipe
     pipeSpwanTimer++;
-    if (pipeSpwanTimer > 180) {
+    if (pipeSpwanTimer > spawnInterval) {
       spawnPipe();
       pipeSpwanTimer = 0;
     }
