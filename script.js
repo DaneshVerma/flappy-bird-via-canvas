@@ -1,5 +1,9 @@
 const canvas = document.getElementById("game");
-const scoreElement = document.getElementById("score");
+const scoreElement = document.getElementById("scoreBoard");
+const gameOverScreen = document.getElementById("gameOverScreen");
+const finalScore = document.getElementById("finalScore");
+const restartBtn = document.getElementById("restartBtn");
+
 const ctx = canvas.getContext("2d");
 let pipes = [];
 let pipeSpwanTimer = 0;
@@ -7,9 +11,10 @@ let birdY = 20;
 let birdX = 50;
 let birdWidth = 20;
 let birdHeight = 20;
-let birdVelocity = 0; // initial vertical velocity
+let birdVelocity = 0;
 let score = 0;
 let dead = false;
+let animationId = null;
 const gravity = 0.2;
 const jumpForce = -2;
 
@@ -27,15 +32,29 @@ function spawnPipe() {
     counted: false,
   });
 }
+function resetGame() {
+  // reset game state
+  pipes = [];
+  pipeSpwanTimer = 0;
+  birdY = 20;
+  birdX = 50;
+  birdVelocity = 0;
+  score = 0;
+  dead = false;
+  scoreElement.innerText = score;
+  gameOverScreen.classList.add("hidden");
+}
+
 function gameOver() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  alert("Game Over! Your score: " + score);
-  score = 0;
-  scoreElement.innerText = score;
-  pipes = [];
-  birdY = 20;
-  birdVelocity = 0;
-  pipeSpwanTimer = 0;
+  gameOverScreen.classList.remove("hidden");
+  scoreElement.classList.add("hidden");
+  finalScore.innerText = `Your final score is: ${score}`;
+
+  restartBtn.onclick = function () {
+    resetGame();
+    loop();
+  };
 }
 
 function isColliding(
@@ -52,7 +71,7 @@ function isColliding(
   aBottom = aTop + aHeight;
   bRight = bLeft + bWidth;
   bBottom = bTop + bHeight;
-  const offset = 4; // optional offset for more forgiving collision
+  const offset = 1; // optional offset for more forgiving collision
   return (
     aLeft + offset < bRight &&
     aRight - offset > bLeft + offset &&
@@ -72,8 +91,6 @@ function loop() {
   birdVelocity += gravity;
   birdY += birdVelocity;
 
-  dead = false;
-
   // UPDATE + DRAW PIPES
   for (let i = 0; i < pipes.length; i++) {
     const pipe = pipes[i];
@@ -87,13 +104,13 @@ function loop() {
     ctx.fillRect(pipe.x, bottomY, 40, canvas.height - bottomY);
 
     // scoring
-    if (!pipe.counted && pipe.x + 40 < birdX) {
+    if (!pipe.counted && !dead && pipe.x + 40 < birdX) {
       score++;
-      scoreElement.innerText = score;
+      scoreElement.innerText = `Score: ${score}`;
       pipe.counted = true;
     }
 
-    // cleanup
+    // remove offscreen pipes
     if (pipe.x + 40 < 0) {
       pipes.splice(i, 1);
       i--;
@@ -130,9 +147,10 @@ function loop() {
     dead = true;
   }
 
-  // SINGLE game-over trigger
+  // game-over trigger
   if (dead) {
     gameOver();
+    return;
   }
 
   // spawn new pipe
@@ -142,7 +160,7 @@ function loop() {
     pipeSpwanTimer = 0;
   }
 
-  requestAnimationFrame(loop);
+  animationId = requestAnimationFrame(loop);
 }
 
 window.addEventListener("keydown", function (e) {
