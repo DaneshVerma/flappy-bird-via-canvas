@@ -1,10 +1,11 @@
-const canvas = document.getElementById("game");
 const scoreElement = document.getElementById("scoreBoard");
 const gameOverScreen = document.getElementById("gameOverScreen");
 const finalScore = document.getElementById("finalScore");
 const restartBtn = document.getElementById("restartBtn");
 
+const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+
 let pipes = [];
 let pipeSpwanTimer = 0;
 let birdY = 20;
@@ -71,7 +72,7 @@ function isColliding(
   aBottom = aTop + aHeight;
   bRight = bLeft + bWidth;
   bBottom = bTop + bHeight;
-  const offset = 1; // optional offset for more forgiving collision
+  const offset = 1; // optional offset to make collision less sensitive
   return (
     aLeft + offset < bRight &&
     aRight - offset > bLeft + offset &&
@@ -160,7 +161,7 @@ function loop() {
     pipeSpwanTimer = 0;
   }
 
-  animationId = requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 
 window.addEventListener("keydown", function (e) {
