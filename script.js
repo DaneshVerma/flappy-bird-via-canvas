@@ -5,24 +5,33 @@ const restartBtn = document.getElementById("restartBtn");
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-
+ctx.imageSmoothingQuality = "high";
+canvas.width = 1080;
+canvas.height = 1280;
 let pipes = [];
+let pipeWidth = 100;
 let pipeSpwanTimer = 0;
 let birdY = 20;
 let birdX = 50;
-let birdWidth = 20;
-let birdHeight = 20;
+let birdWidth = 80;
+let birdHeight = 150;
 let birdVelocity = 0;
 let score = 0;
 let dead = false;
 let animationId = null;
 const gravity = 0.2;
-const jumpForce = -2;
+const jumpForce = -5;
+
+const pipeImg = new Image();
+pipeImg.src = "./images/image.png";
+
+const BiirdImg = new Image();
+BiirdImg.src = "./images/harshbhaiya.png";
 
 function spawnPipe() {
-  const gap = 70;
-  const minTop = 40;
-  const maxTop = 100;
+  const gap = 400;
+  const minTop = 80;
+  const maxTop = canvas.height - gap - 80;
 
   const topHeight = Math.floor(Math.random() * (maxTop - minTop) + minTop);
 
@@ -51,6 +60,7 @@ function gameOver() {
   gameOverScreen.classList.remove("hidden");
   scoreElement.classList.add("hidden");
   finalScore.innerText = `Your final score is: ${score}`;
+  cancelAnimationFrame(animationId);
 
   restartBtn.onclick = function () {
     resetGame();
@@ -72,7 +82,7 @@ function isColliding(
   aBottom = aTop + aHeight;
   bRight = bLeft + bWidth;
   bBottom = bTop + bHeight;
-  const offset = 1; // optional offset to make collision less sensitive
+  const offset = 10; // optional offset to make collision less sensitive
   return (
     aLeft + offset < bRight &&
     aRight - offset > bLeft + offset &&
@@ -85,8 +95,8 @@ function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // DRAW BIRD
-  ctx.fillStyle = "yellow";
-  ctx.fillRect(birdX, birdY, birdWidth, birdHeight);
+  ctx.fillStyle = "transparent";
+  ctx.drawImage(BiirdImg, birdX, birdY, birdWidth, birdHeight);
 
   // UPDATE BIRD
   birdVelocity += gravity;
@@ -99,20 +109,20 @@ function loop() {
 
     // draw
     ctx.fillStyle = "green";
-    ctx.fillRect(pipe.x, 0, 40, pipe.topHeight);
+    ctx.drawImage(pipeImg, pipe.x, 0, pipeWidth, pipe.topHeight);
 
     let bottomY = pipe.topHeight + pipe.gap;
-    ctx.fillRect(pipe.x, bottomY, 40, canvas.height - bottomY);
+    ctx.drawImage(pipeImg, pipe.x, bottomY, pipeWidth, canvas.height - bottomY);
 
     // scoring
-    if (!pipe.counted && !dead && pipe.x + 40 < birdX) {
+    if (!pipe.counted && !dead && pipe.x + pipeWidth < birdX) {
       score++;
       scoreElement.innerText = `Score: ${score}`;
       pipe.counted = true;
     }
 
     // remove offscreen pipes
-    if (pipe.x + 40 < 0) {
+    if (pipe.x + pipeWidth < 0) {
       pipes.splice(i, 1);
       i--;
     }
@@ -126,7 +136,7 @@ function loop() {
         birdHeight,
         pipe.x,
         0,
-        40,
+        pipeWidth,
         pipe.topHeight
       ) ||
       isColliding(
@@ -136,7 +146,7 @@ function loop() {
         birdHeight,
         pipe.x,
         bottomY,
-        40,
+        pipeWidth,
         canvas.height - bottomY
       )
     ) {
@@ -156,12 +166,12 @@ function loop() {
 
   // spawn new pipe
   pipeSpwanTimer++;
-  if (pipeSpwanTimer > 60) {
+  if (pipeSpwanTimer > 180) {
     spawnPipe();
     pipeSpwanTimer = 0;
   }
 
-  requestAnimationFrame(loop);
+  animationId = requestAnimationFrame(loop);
 }
 
 window.addEventListener("keydown", function (e) {
@@ -172,10 +182,10 @@ window.addEventListener("keydown", function (e) {
 
 window.addEventListener("keydown", function (e) {
   if (e.code === "ArrowLeft") {
-    birdX = birdX - 5;
+    birdX = birdX - 10;
   }
   if (e.code === "ArrowRight") {
-    birdX = birdX + 5;
+    birdX = birdX + 10;
   }
 });
 
